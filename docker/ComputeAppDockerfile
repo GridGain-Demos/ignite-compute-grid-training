@@ -1,0 +1,10 @@
+FROM openjdk:11
+RUN apt update
+RUN apt install -y netcat iputils-ping iproute2
+COPY ./target/dependency-jars /usr/app/dependency-jars
+COPY ./bin /usr/app/bin
+ADD ./target/ignite-compute-app.jar /usr/app/ignite-compute-app.jar
+WORKDIR /usr/app
+CMD tail -f /dev/null
+#ENTRYPOINT java -jar ignite-compute-app.jar execTime=$execTime
+

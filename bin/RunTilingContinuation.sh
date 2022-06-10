@@ -1,0 +1,1 @@
+java -cp /usr/app/ignite-compute-app.jar:/usr/app/dependency-jars/* org.gridgain.demo.compute.TilingContinuationExample
