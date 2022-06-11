@@ -20,8 +20,8 @@ package org.gridgain.demo.compute;
 import org.apache.ignite.IgniteLogger;
 
 public class ComputeDemo {
-    //protected static final String CONFIG_PATH = "/opt/ignite/ext-config";
-    protected static final String CONFIG_PATH = "config";
+    protected static final String CONFIG_PATH = "/opt/ignite/ext-config";
+    //protected static final String CONFIG_PATH = "config";
 
     protected static void log(IgniteLogger logger, String message) {
         System.out.println(message);

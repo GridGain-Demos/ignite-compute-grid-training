@@ -216,7 +216,7 @@ public final class TilingContinuationExample extends ComputeDemo {
             // f(n) = f(n-1)  + f(n-2) + p(n-1) * 2
             BigInteger pn1 = pCache.get(n-1);
 
-            BigInteger fn = fn1.add(fn2).add(BigInteger.valueOf(2).multiply(pn1));
+            BigInteger fn = fn1.add(fn2).add(BigInteger.valueOf(2L).multiply(pn1));
             BigInteger pn = pn1.add(fn2);
 
             UUID localNodeUUID = ignite.cluster().localNode().id();
