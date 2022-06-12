@@ -15,7 +15,7 @@ Use [https://github.com/antkr/ignite-compute-demo/blob/main/src/main/java/org/gr
 3. Run the docker image that will start a container with demo client:
    >docker-compose -f docker/ignite-compute-app.yaml up -d
 4. Navigate to the ignite-streaming-app console:
-   - If you are using Linux, run:
+   - If you are using Linux/MacOS, run:
    > 
    >docker exec -it ignite-compute-app bash
    > 
