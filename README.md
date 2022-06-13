@@ -24,4 +24,5 @@ Use [https://github.com/antkr/ignite-compute-demo/blob/main/src/main/java/org/gr
    >winpty docker exec -it ignite-compute-app bash
 5. Run the example based on the classname or via .sh file:
    >java -cp ./ignite-compute-app.jar:./dependency-jars/* org.gridgain.demo.compute.IgniteMapReduce
+   >
    >sh ./bin/RunMapReduce.sh
