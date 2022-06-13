@@ -63,8 +63,6 @@ public final class FibonacciContinuationExample extends ComputeDemo {
             System.out.println();
             System.out.println("Compute Tiling continuation example started.");
 
-            long N = 120;
-
             final UUID exampleNodeId = ignite.cluster().localNode().id();
 
             // Create a filter to remove the local node from the cluster group that will execute the task.
@@ -76,15 +74,18 @@ public final class FibonacciContinuationExample extends ComputeDemo {
                 }
             };
 
-            // Run naive closure implementation for N = 3, must finish.
-            N = 3;
+            long start;
+            long duration;
 
-            long start = System.currentTimeMillis();
+            // Run naive closure implementation for N = 3, must finish.
+            long N = 3;
+
+            start = System.currentTimeMillis();
 
             BigInteger fibv1 = ignite.compute(ignite.cluster().forPredicate(nodeFilter)).apply(
                     new FibonacciClosureBad(nodeFilter), N);
 
-            long duration = System.currentTimeMillis() - start;
+            duration = System.currentTimeMillis() - start;
 
             printFibonacciCalculated(N, fibv1, duration);
 
@@ -96,7 +97,8 @@ public final class FibonacciContinuationExample extends ComputeDemo {
             start = System.currentTimeMillis();
 
             // Add future cleanup task beforehand, as thread pools will starve after next Fibonacci task submission.
-            IgniteFuture<Void> broadcastAsyncFut = ignite.compute(ignite.cluster().forServers()).broadcastAsync(new CleanupTaskFutures());
+            IgniteFuture<Void> taskCancellationFuture = ignite.compute(ignite.cluster().forServers())
+                    .broadcastAsync(new CleanupTaskFutures());
 
             // Run naive closure implementation for N = 120. Won't ever finish, so we must cancel the submitted tasks.
             N = 120;
@@ -109,7 +111,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
 
             // Cancel the futures and future cleanup task.
             fibFuture.cancel();
-            broadcastAsyncFut.cancel();
+            taskCancellationFuture.get();
 
             duration = System.currentTimeMillis() - start;
 
@@ -121,7 +123,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
             start = System.currentTimeMillis();
 
             BigInteger fibv3 = ignite.compute(ignite.cluster().forPredicate(nodeFilter)).apply(
-                    new FibonacciClosureBad(nodeFilter), N);
+                    new FibonacciClosure(nodeFilter), N);
 
             duration = System.currentTimeMillis() - start;
 
@@ -129,6 +131,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
 
             // Run continuation closure implementation for N = 120. Will correctly finish and print
             // the correct answer 'fib(120) = 5358359254990966640871840'.
+
             N = 120;
 
             start = System.currentTimeMillis();
@@ -139,9 +142,10 @@ public final class FibonacciContinuationExample extends ComputeDemo {
             duration = System.currentTimeMillis() - start;
 
             printFibonacciCalculated(N, fib, duration);
+
             System.out.println(">>> If you re-run this example w/o stopping remote nodes - the performance will");
             System.out.println(">>> increase since intermediate results are pre-cache on remote nodes.");
-            System.out.println(">>> You should see prints out every recursive Tiling calc execution on cluster nodes.");
+            System.out.println(">>> You should see prints out every recursive Fibonacci calc execution on cluster nodes.");
             System.out.println(">>> Check remote nodes for output.");
         }
     }
@@ -149,7 +153,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
     private static void printFibonacciCalculated(long n, BigInteger fibv1, long duration) {
         System.out.println();
         System.out.println(">>> Finished executing fibonacci for '" + n + "' in " + duration + " ms.");
-        System.out.println(">>> Fibonacci number '" + n + "' is '" + fibv1.longValue() + "'.");
+        System.out.println(">>> Fibonacci number '" + n + "' is '" + fibv1.toString() + "'.");
     }
 
     /**
@@ -206,8 +210,8 @@ public final class FibonacciContinuationExample extends ComputeDemo {
                 // Make sure n is not negative.
                 n = Math.abs(n);
 
-                if (n <= 1)
-                    return BigInteger.valueOf(n);
+                if (n <= 2)
+                    return n == 0 ? BigInteger.ZERO : BigInteger.ONE;
 
                 ConcurrentMap<Long, IgniteFuture<BigInteger>> locMap = ignite.cluster().nodeLocalMap();
 
@@ -318,7 +322,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
             n = Math.abs(n);
 
             if (n <= 2)
-                return BigInteger.valueOf(n);
+                return n == 0 ? BigInteger.ZERO : BigInteger.ONE;
 
             ClusterGroup p = ignite.cluster().forPredicate(nodeFilter);
 
@@ -353,15 +357,22 @@ public final class FibonacciContinuationExample extends ComputeDemo {
 
                     int size = ignite.compute().activeTaskFutures().size();
 
+                    if (size > 0)
+                        cleanup();
+
                     System.out.println("Currently there are: " + size + " active task futures.");
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
 
                     return;
                 }
 
                 i++;
             }
+
+            cleanup();
+        }
+
+        private void cleanup() {
             Map<IgniteUuid, ComputeTaskFuture<Object>> igniteUuidComputeTaskFutureMap = ignite.compute().activeTaskFutures();
 
             for (Map.Entry<IgniteUuid, ComputeTaskFuture<Object>> computeTaskFutureEntry : igniteUuidComputeTaskFutureMap.entrySet()) {

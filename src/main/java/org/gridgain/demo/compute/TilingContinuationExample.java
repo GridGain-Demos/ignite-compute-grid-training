@@ -222,9 +222,9 @@ public final class TilingContinuationExample extends ComputeDemo {
             UUID localNodeUUID = ignite.cluster().localNode().id();
 
             System.out.println("Local node with id " + localNodeUUID.toString() + " is computing number of ways to tile for length of the tiling surface = " + n +
-                    ", f(n-1) = " + fn1.longValue() + ", f(n-2) = " + fn2.longValue() + ", p(n-1) = " + pn1.longValue() + "\n" +
-                    "F(n) = " + fn.longValue() + "\n" +
-                    "P(n) = " + pn.longValue());
+                    ", f(n-1) = " + fn1.toString() + ", f(n-2) = " + fn2.toString() + ", p(n-1) = " + pn1.toString() + "\n" +
+                    "F(n) = " + fn.toString() + "\n" +
+                    "P(n) = " + pn.toString());
 
             fCache.put(n, fn);
             pCache.put(n, pn);

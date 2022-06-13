@@ -84,6 +84,8 @@
                             <list>
                                 <!-- In distributed environment, replace with actual host IP address. -->
                                 <value>127.0.0.1:47500..47509</value>
+                                <value>docker-ignite-server-node-1:47500..47509</value>
+                                <value>docker-ignite-server-node-2:47500..47509</value>
                             </list>
                         </property>
                     </bean>
