@@ -61,7 +61,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
                 ignite.cluster().state(ClusterState.ACTIVE);
 
             System.out.println();
-            System.out.println("Compute Tiling continuation example started.");
+            System.out.println("Compute Fibonacci continuation example started.");
 
             final UUID exampleNodeId = ignite.cluster().localNode().id();
 
@@ -357,7 +357,7 @@ public final class FibonacciContinuationExample extends ComputeDemo {
 
                     int size = ignite.compute().activeTaskFutures().size();
 
-                    if (size > 0)
+                    if (size > 0 && i > 20)
                         cleanup();
 
                     System.out.println("Currently there are: " + size + " active task futures.");
